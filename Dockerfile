@@ -5,7 +5,7 @@ MAINTAINER Josh.5 "jsunnex@gmail.com"
 ENV CONTAINER_DOMAIN="localhost.io"
 
 
-### Install packages
+### Install base packages
 RUN \
     apt-get update \
     && \
@@ -24,9 +24,10 @@ RUN \
         apache2-bin \
         apache2-data \
         apache2-dev \
-        apache2-utils \
-    && \
-    echo "Install Perl modules" && \
+        apache2-utils
+### Install perl packages
+RUN \
+    echo "Install Perl modules from apt" && \
     apt-get install -y \
         dmtx-utils \
         libarchive-zip-perl \
@@ -100,14 +101,18 @@ RUN \
         libtext-csv-xs-perl \
         libxmlrpc-lite-perl \
         libdbd-sqlite3-perl \
-        libjson-pp-perl \
-    && \
+        libjson-pp-perl
+### Install perl packages
+ARG PERL_MM_USE_DEFAULT=1
+RUN \
+    echo "Install Perl modules from cpan" && \
     cpan install \
         PeekPoke \
         Mail::Sender \
         JSON::DWIW \
         XML::XML2JSON \
-        JSON::RPC::Client@0.96
+    && \
+    cpan install MAKAMAKA/JSON-RPC-0.96.tar.gz
 
 ### Cleanup
 RUN rm -rf /var/lib/apt/lists/*
