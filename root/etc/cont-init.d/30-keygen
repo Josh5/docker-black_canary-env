@@ -1,4 +1,5 @@
 #!/usr/bin/with-contenv bash
+mkdir -p /config/keys
 SUBJECT="/C=US/ST=CA/L=Carlsbad/O=localhost.io/OU=LSIO Server/CN=*"
 if [[ -f /config/keys/cert.key && -f /config/keys/cert.crt ]]; then
 echo "using keys found in /config/keys"
