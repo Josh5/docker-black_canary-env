@@ -9,22 +9,26 @@ ENV CONTAINER_DOMAIN="localhost.io"
 RUN \
     apt-get update \
     && \
-    echo "Install Dependencies" && \
-    apt-get install -y \
-        cron \
-        openssl \
-        nano \
-        ant \
-        mercurial \
-        imagemagick \
+    echo "**** Install Dependencies ****" \
+        && apt-get install -y \
+            cron \
+            openssl \
+            nano \
+            ant \
+            mercurial \
+            imagemagick \
+            iputils-ping \
     && \
-    echo "Install Apache" && \
-    apt-get install -y \
-        apache2 \
-        apache2-bin \
-        apache2-data \
-        apache2-dev \
-        apache2-utils
+    echo "**** Install Apache ****" \
+        && apt-get install -y \
+            apache2 \
+            apache2-bin \
+            apache2-data \
+            apache2-dev \
+            apache2-utils \
+    && \
+    echo "**** Configure Apache ****" \
+        && a2enmod rewrite
 ### Install perl packages
 RUN \
     echo "Install Perl modules from apt" && \
@@ -101,7 +105,8 @@ RUN \
         libtext-csv-xs-perl \
         libxmlrpc-lite-perl \
         libdbd-sqlite3-perl \
-        libjson-pp-perl
+        libjson-pp-perl \
+        liburi-encode-perl
 ### Install perl packages
 ARG PERL_MM_USE_DEFAULT=1
 RUN \
@@ -111,6 +116,7 @@ RUN \
         Mail::Sender \
         JSON::DWIW \
         XML::XML2JSON \
+        HTTP::Async \
     && \
     cpan install MAKAMAKA/JSON-RPC-0.96.tar.gz
 

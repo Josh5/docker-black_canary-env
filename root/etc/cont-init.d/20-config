@@ -5,66 +5,68 @@ CWD=${PWD};
 apache_config() {
     mkdir -p \
         /config/www \
-        /config/apache2 \
+        /config/etc/apache2 \
         /config/log/apache2 \
-        /config/log/xdebug \
         /config/keys \
         /run \
         /var/tmp/apache2 \
         /run/apache2
-    if [[ ! -e /www ]]; then
-        echo "**** (apache_config) Binding www dir ****";
-        ln -s /config/www/ /www;
-    fi
     if [[ ! -h /var/www/html ]]; then
         echo "**** (apache_config) Binding html dir ****";
         rm -rf /var/www/html;
         ln -s /config/www/ /var/www/html;
     fi
-    if [[ ! -f /config/apache2/apache2.conf ]]; then
+    if [[ ! -f /config/etc/apache2/apache2.conf ]]; then
         echo "**** (apache_config) Setting up initial apache2 configs ****";
+        mkdir -p \
+            /config/etc/apache2 \
+            /config/etc/apache2/sites-available \
+            /config/etc/apache2/sites-enabled;
         if [[ ! -h /etc/apache2 ]]; then
-            cp -rf /etc/apache2/* /config/apache2/;
+            cp -rf /etc/apache2/* /config/etc/apache2/;
         fi
-        rm -r /config/apache2/sites-available/*;
-        rm -r /config/apache2/sites-enabled/*;
-        mkdir -p /config/apache2/sites-available /config/apache2/sites-enabled;
-        cp -f /defaults/default.conf /config/apache2/sites-available/default.conf;
-        cp -f /defaults/apache2.conf /config/apache2/apache2.conf;
-        cp -f /defaults/envvars /config/apache2/envvars;
-        cd /config/apache2/sites-enabled/;
+        cp -rf /defaults/etc/apache2/* /config/etc/apache2/;
+        rm -rf /config/etc/apache2/sites-available/*;
+        rm -rf /config/etc/apache2/sites-enabled/*;
+        cp -f /defaults/default.conf /config/etc/apache2/sites-available/default.conf;
+        cd /config/etc/apache2/sites-enabled/;
         ln -s ../sites-available/default.conf default.conf;
         cd ${CWD};
     fi
     if [[ ! -h /etc/apache2 ]]; then
         echo "**** (apache_config) Binding apache2 config folder ****";
         rm -rf /etc/apache2;
-        ln -s /config/apache2 /etc/apache2;
+        ln -s /config/etc/apache2 /etc/apache2;
     fi
     if [[ $(find /config/www -type f | wc -l) -eq 0 ]]; then
+        echo "**** (apache_config) Install default index page ****";
         cp /defaults/index.html /config/www/index.html;
     fi
     if [[ -f /var/run/apache2/apache2.pid ]]; then
         rm -f /var/run/apache2/apache2.pid
     fi
-    if [[ ! -h /config/apache2/mods-enabled/cgi.load && ! -h /config/apache2/mods-enabled/cgid.load ]]; then
-        echo "**** (apache_config) Enable apache cgi module ****";
-        a2enmod cgi
-    fi
+    chown -R $PUID:$PGID \
+        /run/apache2 \
+        /var/lib/apache2
+    chmod -R g+w \
+        /config/www
 }
 permissions_config() {
     echo "**** (permissions_config) Settings permissions ****";
+    mkdir -p \
+        /config/keys \
+        /config/log \
+        /config/tmp \
+        /run \
+        /tmp
     chown -R $PUID:$PGID \
         /config \
-        /run/apache2 \
-        /var/lib/apache2 \
         /config/keys
-    chmod -R g+w \
-        /config/www
     chmod -R a+w \
         /tmp \
         /config/log
 }
 
+permissions_config;
 apache_config;
 permissions_config;
