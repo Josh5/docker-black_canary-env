@@ -106,7 +106,8 @@ RUN \
         libxmlrpc-lite-perl \
         libdbd-sqlite3-perl \
         libjson-pp-perl \
-        liburi-encode-perl
+        liburi-encode-perl \
+        libphp-serialization-perl
 ### Install perl packages
 ARG PERL_MM_USE_DEFAULT=1
 RUN \
